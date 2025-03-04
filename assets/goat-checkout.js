@@ -1,5 +1,5 @@
 window.addEventListener("DOMContentLoaded", () => {
-  console.log("===========> Loaded goat-checkout snippet v1.2.0");
+  console.log("===========> Loaded goat-checkout snippet v1.2.1");
   const $form = document.querySelector("form#cart");
   if (!$form) {
     console.log("===========> Form not found");
@@ -8,7 +8,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   $form.addEventListener("submit", function (event) {
     event.preventDefault();
-    redirectToGoatCheckout();
+    downloadCartItems();
   });
 });
 
