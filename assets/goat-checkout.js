@@ -1,5 +1,5 @@
 window.addEventListener("DOMContentLoaded", () => {
-  console.log("===========> Loaded goat-checkout snippet v1.2.1");
+  console.log("===========> Loaded goat-checkout snippet v1.2.2");
   const $form = document.querySelector("form#cart");
   if (!$form) {
     console.log("===========> Form not found");
@@ -41,6 +41,7 @@ function redirectToGoatCheckout(cartData) {
   $input.name = "cart";
   $input.value = JSON.stringify(cartData);
   $form.appendChild($input);
+  document.body.appendChild($form);
   cleanCart($form);
 }
 
