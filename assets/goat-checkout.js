@@ -1,8 +1,8 @@
 /* eslint-disable */
 
 window.addEventListener('DOMContentLoaded', () => {
-  console.log('===========> Loaded goat-checkout snippet v1.2.2');
-  const $form = document.querySelector('form#cart');
+  console.log('===========> Loaded goat-checkout snippet v1.3.0');
+  const $form = document.querySelector('form[action="/cart"]');
   if (!$form) {
     console.log('===========> Form not found');
     return;
