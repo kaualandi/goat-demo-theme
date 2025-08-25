@@ -1,14 +1,18 @@
 /* eslint-disable */
 
 window.addEventListener('DOMContentLoaded', () => {
-  console.log('===========> Loaded goat-checkout snippet v1.3.0');
+  console.log('===========> Loaded goat-checkout snippet v1.3.1');
   const $form = document.querySelector('form[action="/cart"]');
   if (!$form) {
     console.log('===========> Form not found');
     return;
   }
 
-  $form.addEventListener('submit', function (event) {
+  // remove all old listeners
+  const newForm = $form.cloneNode(true);
+  $form.parentNode.replaceChild(newForm, $form);
+
+  newForm.addEventListener('submit', function (event) {
     event.preventDefault();
     downloadCartItems();
   });
