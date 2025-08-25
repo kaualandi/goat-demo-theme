@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 window.addEventListener('DOMContentLoaded', () => {
-  console.log('===========> Loaded goat-checkout snippet v1.3.2');
+  console.log('===========> Loaded goat-checkout snippet v1.3.3');
   const $form = document.querySelector('form[action="/cart"]');
   if (!$form) {
     console.log('===========> Form not found');
@@ -38,7 +38,7 @@ function downloadCartItems() {
 function redirectToGoatCheckout(cartData) {
   const $form = document.createElement('form');
   $form.method = 'POST';
-  $form.action = 'https://goat.noclaf.com.br/cart/shopify/';
+  $form.action = 'https://apidev.goatcom.io/cart/shopify/';
   $form.style.display = 'none';
 
   const $input = document.createElement('input');
