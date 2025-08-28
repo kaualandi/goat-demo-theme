@@ -1,19 +1,21 @@
 /* eslint-disable */
 
 window.addEventListener('DOMContentLoaded', () => {
-  console.log('===========> Loaded goat-checkout snippet v1.3.3');
-  const $form = document.querySelector('form[action="/cart"]');
-  if (!$form) {
+  console.log('===========> Loaded goat-checkout snippet v1.4.0');
+  const $forms = document.querySelectorAll('form[action="/cart"]');
+  if (!$forms.length) {
     console.log('===========> Form not found');
     return;
   }
 
-  // remove current action
-  $form.removeAttribute('action');
-
-  $form.addEventListener('submit', function (event) {
-    event.preventDefault();
-    downloadCartItems();
+  $forms.forEach(($form) => {
+    // remove current action
+    $form.removeAttribute('action');
+    // add goat submission
+    $form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      downloadCartItems();
+    });
   });
 });
 
