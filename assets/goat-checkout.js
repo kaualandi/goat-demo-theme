@@ -1,11 +1,27 @@
 /* eslint-disable */
 
-window.addEventListener('DOMContentLoaded', () => {
-  console.log('===========> Loaded goat-checkout snippet v1.5.1');
+var goatSubmitting = false;
 
-  // If user navigated back via browser (bfcache), reload to reflect the cleared cart
+window.addEventListener('DOMContentLoaded', () => {
+  console.log('===========> Loaded goat-checkout snippet v1.6.0');
+
+  // Safari desktop may restore from disk cache (not bfcache), so DOMContentLoaded fires —
+  // check the flag here to handle that case.
+  if (sessionStorage.getItem('goat-cart-cleared')) {
+    console.log(
+      '===========> Detected goat-cart-cleared flag on DOMContentLoaded, reloading page'
+    );
+    sessionStorage.removeItem('goat-cart-cleared');
+    window.location.reload();
+    return;
+  }
+
+  // If user navigated back via browser (bfcache — iOS/other browsers), reload to reflect the cleared cart
   window.addEventListener('pageshow', function (event) {
     if (event.persisted && sessionStorage.getItem('goat-cart-cleared')) {
+      console.log(
+        '===========> Detected goat-cart-cleared flag on pageshow, reloading page'
+      );
       sessionStorage.removeItem('goat-cart-cleared');
       window.location.reload();
     }
@@ -23,14 +39,28 @@ window.addEventListener('DOMContentLoaded', () => {
     // add goat submission
     $form.addEventListener('submit', function (event) {
       event.preventDefault();
-      showGoatLoading();
+      if (goatSubmitting) return;
+      goatSubmitting = true;
+      setSubmitButtonsDisabled($forms, true);
+      // showGoatLoading();
       downloadCartItems();
     });
   });
 });
 
+function setSubmitButtonsDisabled($forms, disabled) {
+  $forms.forEach(function ($form) {
+    var buttons = $form.querySelectorAll(
+      'button[type="submit"], input[type="submit"]'
+    );
+    buttons.forEach(function (btn) {
+      btn.disabled = disabled;
+    });
+  });
+}
+
 function showGoatLoading() {
-  const overlay = document.createElement('div');
+  var overlay = document.createElement('div');
   overlay.id = 'goat-loading-overlay';
   overlay.style.cssText =
     'position:fixed;top:0;left:0;width:100%;height:100%;' +
@@ -43,6 +73,13 @@ function showGoatLoading() {
   document.body.appendChild(overlay);
 }
 
+function resetGoatSubmission() {
+  goatSubmitting = false;
+  var $forms = document.querySelectorAll('form:not([action])');
+  setSubmitButtonsDisabled($forms, false);
+  // removeGoatLoading();
+}
+
 function downloadCartItems() {
   fetch(window.Shopify.routes.root + 'cart.js', {
     method: 'GET',
@@ -50,25 +87,32 @@ function downloadCartItems() {
       'Content-Type': 'application/json',
     },
   })
-    .then((response) => response.json())
-    .then((cartData) => {
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (cartData) {
       console.log('===========> CART DATA', cartData);
+      if (!cartData.items || !cartData.items.length) {
+        console.log('===========> Cart is empty, reloading page');
+        window.location.reload();
+        return;
+      }
       redirectToGoatCheckout(cartData);
     })
-    .catch((error) => {
+    .catch(function (error) {
       console.error('Error:', error);
-      removeGoatLoading();
+      resetGoatSubmission();
       alert('Erro ao obter o carrinho.');
     });
 }
 
 function redirectToGoatCheckout(cartData) {
-  const $form = document.createElement('form');
+  var $form = document.createElement('form');
   $form.method = 'POST';
   $form.action = 'https://api.goatcom.io/cart/shopify/';
   $form.style.display = 'none';
 
-  const $input = document.createElement('input');
+  var $input = document.createElement('input');
   $input.type = 'hidden';
   $input.name = 'cart';
   $input.value = JSON.stringify(cartData);
@@ -84,21 +128,23 @@ function cleanCart($form) {
       'Content-Type': 'application/json',
     },
   })
-    .then((response) => response.json())
-    .then((cartData) => {
-      console.log('===========> CLEANRED DATA', cartData);
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (cartData) {
+      console.log('===========> CLEANED DATA', cartData);
       // Mark that the cart was cleared so we can handle the bfcache back-navigation
       sessionStorage.setItem('goat-cart-cleared', '1');
       $form.submit();
     })
-    .catch((error) => {
+    .catch(function (error) {
       console.error('Error:', error);
-      removeGoatLoading();
+      resetGoatSubmission();
       alert('Erro ao limpar o carrinho.');
     });
 }
 
 function removeGoatLoading() {
-  const overlay = document.getElementById('goat-loading-overlay');
+  var overlay = document.getElementById('goat-loading-overlay');
   if (overlay) overlay.remove();
 }
